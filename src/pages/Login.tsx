@@ -1,7 +1,10 @@
 import React from "react";
+import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import styled from "styled-components";
-import { userService } from "../api/api";
+import axios from "axios";
+import { useHistory } from "react-router-dom";
+import ErrorMessage from "../components/ErrorMessage";
 
 interface ILogin {
   email: string;
@@ -11,6 +14,7 @@ interface ILogin {
 const LoginContainer = styled.main`
   display: flex;
   justify-content: center;
+  flex-direction: column;
   align-items: center;
   margin-top: 20px;
 `;
@@ -50,19 +54,52 @@ const LoginInput = styled.input`
 `;
 
 const Login = () => {
+  const TOKEN = "token";
   const { register, handleSubmit } = useForm<ILogin>();
+  const history = useHistory();
+  const [loginData, setLoginData] = useState<{
+    ok: boolean;
+    error?: string;
+    token?: string;
+  } | null>(null);
 
-  const onSubmit: SubmitHandler<ILogin> = async (data) => {
-    await userService.login(data);
+  const onSubmit: SubmitHandler<ILogin> = async ({ email, password }) => {
+    await axios({
+      method: "post",
+      url: "http://localhost:4000/users/login",
+      data: {
+        email,
+        password,
+      },
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    })
+      .then(({ data }) => {
+        setLoginData(data);
+        if (loginData?.token) {
+          localStorage.setItem(TOKEN, loginData.token);
+          axios.defaults.headers["token"] = loginData.token;
+          history.push("/");
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
     <LoginContainer>
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Input placeholder="email" {...register("email")} />
-        <Input placeholder="password" {...register("password")} />
+        <Input
+          placeholder="password"
+          type="password"
+          {...register("password")}
+        />
         <LoginInput type="submit" value="로그인" />
       </Form>
+      {loginData?.error && <ErrorMessage error={loginData.error} />}
     </LoginContainer>
   );
 };

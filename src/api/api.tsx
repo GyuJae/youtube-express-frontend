@@ -1,11 +1,6 @@
 import axios from "axios";
 
-interface ILogin {
-  email: string;
-  password: string;
-}
-
-const postApi = (data?: ILogin) =>
+const postApi = () =>
   axios.create({
     method: "post",
     baseURL: "http://localhost:4000/",
@@ -13,9 +8,6 @@ const postApi = (data?: ILogin) =>
       Accept: "*/*",
       "Access-Control-Allow-Origin": "*",
       "Content-Type": "text/xml",
-    },
-    data: {
-      ...data,
     },
   });
 
@@ -31,19 +23,11 @@ const getApi = () =>
 export const userService = {
   search: () => getApi().get("users/search"),
   join: () => postApi().post("users/join"),
-  login: (input: ILogin) =>
-    postApi(input)
-      .post("users/login")
-      .then((res) => {
-        // const { token } = res.data;
-        // axios.defaults.headers["token"] = token;
-        // console.log(axios.defaults.headers["token"]);
-        console.log(res);
-      }),
   remove: (id: string) => postApi().post(`users/remove/${id}`),
   edit: (id: string) => postApi().post(`users/edit/${id}`),
   detail: (id: string) => getApi().get(`users/${id}`),
   kakaoLogin: () => getApi().get(`users/kakao-login`),
+  findById: (id: string) => getApi().get(`users/${id}`),
 };
 
 export const videoService = {

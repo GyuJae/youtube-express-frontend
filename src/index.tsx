@@ -2,14 +2,17 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { ThemeProvider } from "styled-components";
 import App from "./App";
+import { UserContextProvider } from "./contexts/user.context";
 import reportWebVitals from "./reportWebVitals";
 import { theme } from "./theme";
 
 ReactDOM.render(
   <React.StrictMode>
-    <ThemeProvider theme={theme}>
-      <App />
-    </ThemeProvider>
+    <UserContextProvider>
+      <ThemeProvider theme={theme}>
+        <App />
+      </ThemeProvider>
+    </UserContextProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );

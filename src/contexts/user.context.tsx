@@ -1,5 +1,6 @@
-import axios from "axios";
-import React, { createContext, ReactNode } from "react";
+import React, { createContext, ReactNode, useContext, useState } from "react";
+import jwt from "jsonwebtoken";
+import { userService } from "../api/api";
 
 const TOKEN = "token";
 
@@ -11,14 +12,41 @@ interface IUser {
   avatarUrl: string;
 }
 
-const UserContext = createContext<IUser | null>(null);
+interface State {
+  user: IUser | null;
+}
 
-const getUser = () => {
-  console.log(axios.defaults.headers);
+const UserContext = createContext<State>({
+  user: null,
+});
+
+const tokenVerify = async (token: string) => {
+  const decoded = await jwt.verify(
+    token,
+    process.env.REACT_APP_JWT_PRIVATE_KEY as string
+  );
+  if (typeof decoded === "object" && decoded.hasOwnProperty("id")) {
+    const userId = decoded["id"];
+    const user = await userService.findById(userId);
+
+    return user;
+  }
+  return null;
 };
 
 export const UserContextProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  return <UserContext.Provider value={null}>{children}</UserContext.Provider>;
+  const token = localStorage.getItem(TOKEN);
+  const [user, setUser] = useState<IUser | null | any>(null);
+  if (token) {
+    const tokenUser = tokenVerify(token);
+    setUser(tokenUser);
+  }
+  return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
+};
+
+export const useUser = () => {
+  const { user } = useContext(UserContext);
+  return user;
 };
