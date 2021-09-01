@@ -1,8 +1,6 @@
 import React, { createContext, ReactNode, useContext, useState } from "react";
-import jwt from "jsonwebtoken";
-import { userService } from "../api/api";
-
-const TOKEN = "token";
+import { TOKEN } from "../contants";
+import { tokenVerify } from "../utils/tokenVerify";
 
 interface IUser {
   _id: string;
@@ -19,20 +17,6 @@ interface State {
 const UserContext = createContext<State>({
   user: null,
 });
-
-const tokenVerify = async (token: string) => {
-  const decoded = await jwt.verify(
-    token,
-    process.env.REACT_APP_JWT_PRIVATE_KEY as string
-  );
-  if (typeof decoded === "object" && decoded.hasOwnProperty("id")) {
-    const userId = decoded["id"];
-    const user = await userService.findById(userId);
-
-    return user;
-  }
-  return null;
-};
 
 export const UserContextProvider: React.FC<{ children: ReactNode }> = ({
   children,

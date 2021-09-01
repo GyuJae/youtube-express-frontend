@@ -38,7 +38,7 @@ const LoginItem = styled.li`
   border-radius: 5px;
   margin-right: 10px;
   &:hover {
-    filter: brightness(90%);
+    filter: brightness(120%);
   }
 `;
 
@@ -59,6 +59,11 @@ const Header = () => {
         <LoginItem>
           <Link to="/login">
             <LoginTitle>로그인</LoginTitle>
+          </Link>
+        </LoginItem>
+        <LoginItem>
+          <Link to="/profile">
+            <LoginTitle>편집</LoginTitle>
           </Link>
         </LoginItem>
       </NavList>

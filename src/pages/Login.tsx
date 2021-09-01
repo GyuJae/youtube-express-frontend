@@ -42,7 +42,7 @@ const Input = styled.input`
   width: 80%;
 `;
 
-const LoginInput = styled.input`
+const SubmitInput = styled.input`
   width: 80%;
   background-color: ${(props) => props.theme.colors.blue};
   color: ${(props) => props.theme.colors.white};
@@ -51,6 +51,9 @@ const LoginInput = styled.input`
   display: flex;
   justify-content: center;
   align-items: center;
+  &:hover {
+    filter: brightness(120%);
+  }
 `;
 
 const Login = () => {
@@ -97,7 +100,7 @@ const Login = () => {
           type="password"
           {...register("password")}
         />
-        <LoginInput type="submit" value="로그인" />
+        <SubmitInput type="submit" value="로그인" />
       </Form>
       {loginData?.error && <ErrorMessage error={loginData.error} />}
     </LoginContainer>

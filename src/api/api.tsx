@@ -1,4 +1,5 @@
 import axios from "axios";
+import { TOKEN } from "../contants";
 
 const postApi = () =>
   axios.create({
@@ -8,6 +9,7 @@ const postApi = () =>
       Accept: "*/*",
       "Access-Control-Allow-Origin": "*",
       "Content-Type": "text/xml",
+      token: localStorage.getItem(TOKEN),
     },
   });
 
