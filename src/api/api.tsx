@@ -1,5 +1,7 @@
 import axios from "axios";
 import { TOKEN } from "../contants";
+import { IUser } from "../types/User.interface";
+import { IVideo } from "../types/Video.interface";
 
 const postApi = () =>
   axios.create({
@@ -29,11 +31,11 @@ export const userService = {
   edit: (id: string) => postApi().post(`users/edit/${id}`),
   detail: (id: string) => getApi().get(`users/${id}`),
   kakaoLogin: () => getApi().get(`users/kakao-login`),
-  findById: (id: string) => getApi().get(`users/${id}`),
+  findById: (id: string) => getApi().get<IUser>(`users/${id}`),
 };
 
 export const videoService = {
-  videos: () => getApi().get("videos"),
+  videos: () => getApi().get<{ ok: boolean; videos: IVideo[] }>("videos"),
   search: () => getApi().get("videos/search"),
   upload: () => postApi().post("videos/upload"),
   detail: (id: string) => getApi().get(`videos/${id}`),

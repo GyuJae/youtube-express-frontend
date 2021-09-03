@@ -3,7 +3,7 @@ import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import styled from "styled-components";
 import axios from "axios";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import ErrorMessage from "../components/ErrorMessage";
 
 interface ILogin {
@@ -56,6 +56,20 @@ const SubmitInput = styled.input`
   }
 `;
 
+const CreateAccountContainer = styled.div`
+  margin-top: 10px;
+  color: ${(props) => props.theme.colors.grayIcon};
+  font-size: 12px;
+`;
+
+const CreateAccountLink = styled(Link)`
+  color: ${(props) => props.theme.colors.blue};
+  font-weight: 700;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
 const Login = () => {
   const TOKEN = "token";
   const { register, handleSubmit } = useForm<ILogin>();
@@ -84,6 +98,7 @@ const Login = () => {
           localStorage.setItem(TOKEN, loginData.token);
           axios.defaults.headers["token"] = loginData.token;
           history.push("/");
+          history.go(0);
         }
       })
       .catch((error) => {
@@ -102,6 +117,12 @@ const Login = () => {
         />
         <SubmitInput type="submit" value="로그인" />
       </Form>
+      <CreateAccountContainer>
+        아직 계정이 없으신가요?{" "}
+        <CreateAccountLink to={"/create-account"}>
+          계정 만들기
+        </CreateAccountLink>
+      </CreateAccountContainer>
       {loginData?.error && <ErrorMessage error={loginData.error} />}
     </LoginContainer>
   );

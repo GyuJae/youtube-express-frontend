@@ -2,6 +2,8 @@ import React from "react";
 import { FaYoutube } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { useUser } from "../contexts/user.context";
+import ProfileIcon from "./ProfileIcon";
 
 const Nav = styled.nav`
   padding: 20px 10px;
@@ -47,6 +49,7 @@ const LoginTitle = styled.h2`
 `;
 
 const Header = () => {
+  const user = useUser();
   return (
     <Nav>
       <NavList>
@@ -56,16 +59,21 @@ const Header = () => {
             <YoutubeTitle>Youtube</YoutubeTitle>
           </YoutubeLink>
         </HomeItem>
-        <LoginItem>
-          <Link to="/login">
-            <LoginTitle>로그인</LoginTitle>
-          </Link>
-        </LoginItem>
-        <LoginItem>
-          <Link to="/profile">
-            <LoginTitle>편집</LoginTitle>
-          </Link>
-        </LoginItem>
+        {user ? (
+          <>
+            <Link to="/profile">
+              <ProfileIcon username={user.username} />
+            </Link>
+          </>
+        ) : (
+          <>
+            <Link to="/login">
+              <LoginItem>
+                <LoginTitle>로그인</LoginTitle>
+              </LoginItem>
+            </Link>
+          </>
+        )}
       </NavList>
     </Nav>
   );

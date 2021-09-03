@@ -5,6 +5,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import styled from "styled-components";
 import { TOKEN } from "../contants";
 import { tokenVerify } from "../utils/tokenVerify";
+import { useHistory } from "react-router-dom";
+import { IUser } from "../types/User.interface";
 
 interface IEditForm {
   username: string;
@@ -15,8 +17,8 @@ interface IEditForm {
 const ProfileContainer = styled.main`
   display: flex;
   justify-content: center;
-  flex-direction: column;
   align-items: center;
+  flex-direction: column;
   margin-top: 20px;
 `;
 
@@ -47,11 +49,12 @@ const Input = styled.input`
   padding: 5px 20px;
   margin-bottom: 5px;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-  width: 80%;
+  width: 90%;
 `;
 
 const SubmitInput = styled.input`
-  width: 80%;
+  width: 90%;
+  margin-top: 10px;
   background-color: ${(props) => props.theme.colors.blue};
   color: ${(props) => props.theme.colors.white};
   padding: 5px 20px;
@@ -64,9 +67,38 @@ const SubmitInput = styled.input`
   }
 `;
 
+const BtnContainer = styled.div`
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 20%;
+`;
+
+const Btn = styled.button`
+  padding: 5px 10px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: ${(props) => props.theme.colors.white};
+  &:hover {
+    filter: brightness(90%);
+  }
+`;
+
+const LogoutBtn = styled(Btn)`
+  background-color: ${(props) => props.theme.colors.cancelRed};
+`;
+
+const DeleteAccount = styled(Btn)`
+  background-color: ${(props) => props.theme.colors.red};
+`;
+
 const Profile = () => {
   const { register, handleSubmit } = useForm<IEditForm>();
-  const [user, setUser] = useState<any>(null);
+  const history = useHistory();
+  const [user, setUser] = useState<IUser>();
   const token = localStorage.getItem(TOKEN);
   const onSubmit: SubmitHandler<IEditForm> = async ({
     username,
@@ -86,17 +118,47 @@ const Profile = () => {
         TOKEN: token,
       },
     })
-      .then(({ data }) => {
-        console.log(data);
+      .then(({ data: { ok } }) => {
+        if (ok) {
+          history.push("/");
+          history.go(0);
+        }
       })
       .catch((error) => {
         console.log(error);
       });
   };
 
+  const logout = () => {
+    localStorage.removeItem(TOKEN);
+    history.push("/");
+    history.go(0);
+  };
+
   const getUser = async (token: string) => {
     const result = await tokenVerify(token);
-    setUser(result?.data);
+    setUser(result?.data as IUser);
+  };
+
+  const deleteAccount = async () => {
+    await axios({
+      method: "post",
+      url: `http://localhost:4000/users/remove/${user?._id}`,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        TOKEN: token,
+      },
+    })
+      .then(({ data: { ok } }) => {
+        if (ok) {
+          localStorage.removeItem(TOKEN);
+          history.push("/");
+          history.go(0);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   useEffect(() => {
@@ -108,17 +170,32 @@ const Profile = () => {
     <ProfileContainer>
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Label htmlFor="username">Username</Label>
-        <Input id="username" placeholder="Username" {...register("username")} />
+        <Input
+          id="username"
+          placeholder="Username"
+          defaultValue={user?.username}
+          {...register("username")}
+        />
         <Label htmlFor="password">Password</Label>
-        <Input id="password" placeholder="Password" {...register("password")} />
+        <Input
+          id="password"
+          placeholder="Password"
+          defaultValue={user?.password}
+          {...register("password")}
+        />
         <Label htmlFor="avatarURL">AvatarURL</Label>
         <Input
           id="avatarURL"
           placeholder="AvatarURL"
+          defaultValue={user?.avatarUrl}
           {...register("avatarURL")}
         />
-        <SubmitInput type="submit" />
+        <SubmitInput type="submit" value="편집" />
       </Form>
+      <BtnContainer>
+        <LogoutBtn onClick={logout}>로그아웃</LogoutBtn>
+        <DeleteAccount onClick={deleteAccount}>계정삭제</DeleteAccount>
+      </BtnContainer>
     </ProfileContainer>
   );
 };

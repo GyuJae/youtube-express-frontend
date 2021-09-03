@@ -10,5 +10,6 @@ export const theme: DefaultTheme = {
     grayIcon: "#909090",
     blue: "#065FD4",
     grayHover: "#E5E5E5",
+    cancelRed: "#FF605C",
   },
 };
